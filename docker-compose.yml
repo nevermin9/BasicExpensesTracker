@@ -1,0 +1,37 @@
+services:
+  php:
+    build: .
+    container_name: basic-app
+    restart: always
+    working_dir: /var/www/html
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=basicdb
+    volumes:
+      - ./src:/var/www/html
+  
+  nginx:
+    image: nginx:1.29-alpine
+    container_name: basic-webserver
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx:/etc/nginx/conf.d
+  db:
+    image: mysql:8.0
+    container_name: basic-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: basicdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - basicdb_volume:/var/lib/mysql
+
+volumes:
+  basicdb_volume:

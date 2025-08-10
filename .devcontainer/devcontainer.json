@@ -1,0 +1,20 @@
+{
+  "name": "Basic Expenses Tracker",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "php",
+  "workspaceFolder": "/var/www/html",
+  "postCreateCommand": "composer install",
+  "forwardPorts": [8080],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      },
+      "extensions": [
+        "felixfbecker.php-debug",
+        "xdebug.php-pack",
+        "bmewburn.vscode-intelephense-client"
+      ]
+    }
+  }
+}

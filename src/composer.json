@@ -1,0 +1,5 @@
+{
+    "name": "my/basic-expenses-tracker",
+    "description": "A basic PHP project.",
+    "require": {}
+}
