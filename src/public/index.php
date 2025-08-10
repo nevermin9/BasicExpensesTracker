@@ -44,5 +44,10 @@ function doRouting($reqUri): array
 
 $result = doRouting($requestUri);
 http_response_code($result['status']);
+
+include "templates/head.html";
+include "templates/nav.php";
+
 require $result['filepath'];
 
+include "templates/footer.html";
