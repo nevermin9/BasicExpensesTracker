@@ -1,15 +1,7 @@
-<?php
-// $navigation = [
-//     "Home" => "/",
-//     "Categories" => "/categories",
-//     "Expenses" => "/expenses",
-// ];
-?>
-
 <header>
     <nav>
         <ul>
-            <?php foreach ($navigation as $name => $path): ?>
+            <?php foreach ($GLOBALS['navigation'] as $name => $path): ?>
             <li>
                 <a href="<?= $path ?>">
                     <?= $name ?>

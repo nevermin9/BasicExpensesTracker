@@ -1,4 +1,14 @@
 <?php
+declare(strict_types=1);
+
+session_start();
+if (empty($_SESSION['csrf_token']))
+{
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(35));
+}
+
+
+set_exception_handler('exception_handler');
 
 $requestUri = $_SERVER['REQUEST_URI'];
 
@@ -10,8 +20,6 @@ $navigation = [
 
 function doRouting($reqUri): array
 {
-    global $navigation;
-
     $viewsDir = "/views";
     $filepath = "";
     $status = 200;
@@ -22,7 +30,7 @@ function doRouting($reqUri): array
     }
     else
     {
-        $uris = array_values($navigation);
+        $uris = array_values($GLOBALS['navigation']);
         $found = array_find($uris, static fn($u) => $u === $reqUri);
 
         if ($found)
@@ -42,12 +50,20 @@ function doRouting($reqUri): array
     ];
 }
 
-$result = doRouting($requestUri);
-http_response_code($result['status']);
+function exception_handler(Throwable $exc)
+{
+    echo "Exception: \n";
+    echo $exc->getMessage();
+}
+
+['status' => $status, 'filepath' => $filepath] = doRouting($requestUri);
+http_response_code($status);
+
+ob_start();
 
 include "templates/head.html";
 include "templates/nav.php";
 
-require $result['filepath'];
+require $filepath;
 
 include "templates/footer.html";
