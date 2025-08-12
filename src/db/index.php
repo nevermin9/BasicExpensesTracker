@@ -19,7 +19,7 @@ function initDB()
     //     echo "Error while connecting to database: " . $error->getMessage();
     // }
 
-    return function() use ($pdo)
+    return function() use ($pdo): PDO
     {
         return $pdo;
     };

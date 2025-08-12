@@ -5,9 +5,7 @@ $stmt = $pdo->query('SELECT id,name FROM categories;');
 $categoriesList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $cols = [];
 $errors = [];
-$valid = true;
-$success = false;
-
+$isSuccess = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit']))
 {
@@ -27,12 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit']))
 
     $cols['sum'] = filter_var($cols['sum'], FILTER_VALIDATE_FLOAT, ['options' => ['min_range' => 0]]);
 
-    if (empty($cols['name']) || strlen($cols['name']) < 3 || strlen($cols['name']) > 100)
+    if (empty($cols['name']) || mb_strlen($cols['name']) < 3 || mb_strlen($cols['name']) > 100)
     {
         $errors['Name'] = 'Invalid name';
     }
 
-    if (!empty($cols['description']) && strlen($cols['description']) > 150)
+    if (!empty($cols['description']) && mb_strlen($cols['description']) > 150)
     {
         $errors['Description'] = 'Description is too long';
     }
@@ -53,20 +51,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit']))
         $errors['Category'] = "Invalid category";
     }
 
-    $valid = empty($errors);
-
-    if ($valid)
+    if (empty($errors))
     {
         $stmt = $pdo->prepare(
             "INSERT INTO expenses(" . implode(", ", array_keys($cols)) . ")" . "VALUES(:" . implode(", :", array_keys($cols)) . ")"
         );
 
         $stmt->execute($cols);
-        $_SESSION['success'] = true;
+        $_SESSION['is_success'] = true;
     } else {
         $_SESSION['errors'] = $errors;
         $_SESSION['cols'] = $cols;
-        $_SESSION['valid'] = $valid;
     }
 
     header('Location: /', true, 303);
@@ -77,7 +72,7 @@ else if ( $_SERVER['REQUEST_METHOD'] === 'GET' )
     if (isset($_SESSION['errors']))
     {
         $errors = $_SESSION['errors'];
-        unset($_SESSION['erros']);
+        unset($_SESSION['errors']);
     }
 
     if (isset($_SESSION['cols']))
@@ -86,16 +81,10 @@ else if ( $_SERVER['REQUEST_METHOD'] === 'GET' )
         unset($_SESSION['cols']);
     }
 
-    if (isset($_SESSION['valid']))
+    if (isset($_SESSION['is_success']))
     {
-        $valid = $_SESSION['valid'];
-        unset($_SESSION['valid']);
-    }
-
-    if (isset($_SESSION['success']))
-    {
-        $success = $_SESSION['success'];
-        unset($_SESSION['success']);
+        $isSuccess = $_SESSION['is_success'];
+        unset($_SESSION['is_success']);
     }
 }
 ?>
@@ -105,7 +94,7 @@ else if ( $_SERVER['REQUEST_METHOD'] === 'GET' )
         Add expense/income entry
     </h1>
 
-    <?php if (!$valid): ?>
+    <?php if (!empty($errors)): ?>
     <p>
         <span>
             Validation errors:
@@ -120,13 +109,13 @@ else if ( $_SERVER['REQUEST_METHOD'] === 'GET' )
             </li>
             <?php endforeach ?>
         </ul>
-    <p>
+    </p>
     <?php endif ?>
 
-    <?php if ($success): ?>
+    <?php if ($isSuccess): ?>
     <p id="success-msg">
         The entry was successfully added!
-    <p>
+    </p>
     <?php endif ?>
 
     <form method="POST" action="/">
@@ -138,7 +127,7 @@ else if ( $_SERVER['REQUEST_METHOD'] === 'GET' )
                 minlength="3"
                 maxlength="100"
                 name="name"
-                autocomplete="false"
+                autocomplete="off"
                 placeholder="Laptop"
                 required
                 value="<?php echo htmlspecialchars($cols['name'] ?? ''); ?>"
