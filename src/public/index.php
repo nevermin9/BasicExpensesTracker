@@ -6,11 +6,12 @@ if (empty($_SESSION['csrf_token']))
 {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(35));
 }
+ob_start();
 
 
 set_exception_handler('exception_handler');
 
-$requestUri = $_SERVER['REQUEST_URI'];
+$requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $navigation = [
     "Home" => "/",
@@ -59,7 +60,6 @@ function exception_handler(Throwable $exc)
 ['status' => $status, 'filepath' => $filepath] = doRouting($requestUri);
 http_response_code($status);
 
-ob_start();
 
 include "templates/head.html";
 include "templates/nav.php";
