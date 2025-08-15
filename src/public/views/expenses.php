@@ -19,40 +19,26 @@ $options = [
 $options = array_filter($options);
 $optionsSql = [];
 
-foreach ($options as $key => $val)
-{
+foreach ($options as $key => $val) {
     if ($key === 'nameDescSubstring') {
         $optionsSql[$key] = "(name LIKE CONCAT('%' :nameDescSubstring '%') OR description LIKE CONCAT('%' :nameDescSubstring '%'))";
-    }
-    else if ($key === 'fromTs')
-    {
+    } elseif ($key === 'fromTs') {
         $optionsSql[$key] = "timestamp >= :fromTs";
-    }
-    else if ($key === 'toTs')
-    {
+    } elseif ($key === 'toTs') {
         $optionsSql[$key] = "timestamp <= :toTs";
-    }
-    else if ($key === 'fromSum')
-    {
+    } elseif ($key === 'fromSum') {
         $optionsSql[$key] = "sum >= :fromSum";
-    }
-    else if ($key === 'toTs')
-    {
+    } elseif ($key === 'toTs') {
         $optionsSql[$key] = "sum <= :toSum";
-    }
-    else
-    {
+    } else {
         // type, category_id
         $optionsSql[$key] = "$key = :$key";
     }
 }
 
-if (count($optionsSql) > 0)
-{
+if (count($optionsSql) > 0) {
     $sql = $sql . " WHERE " . implode(" AND ", $optionsSql) . ";";
-}
-else
-{
+} else {
     $sql = $sql . ";";
 }
 

@@ -7,70 +7,52 @@ $isAdditionSuccess = false;
 $isDeletionSuccess = false;
 $isValid = true;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST')
-{
-    if (!isset($_POST['token']) || !hash_equals($_SESSION['csrf_token'], $_POST['token']))
-    {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['token']) || !hash_equals($_SESSION['csrf_token'], $_POST['token'])) {
         exit("Something went wrong...");
     }
 
     // addition
-    if (isset($_POST['add_new']))
-    {
+    if (isset($_POST['add_new'])) {
         $newCategoryName = trim($_POST['category_name']);
 
-        if (empty($newCategoryName) || mb_strlen($newCategoryName) < 3 || mb_strlen($newCategoryName) > 100)
-        {
+        if (empty($newCategoryName) || mb_strlen($newCategoryName) < 3 || mb_strlen($newCategoryName) > 100) {
             $isValid = false;
         }
 
-        if ($isValid)
-        {
+        if ($isValid) {
             $stmt = $pdo->prepare("INSERT INTO categories (name) VALUES (:name)");
             $stmt->execute(['name' => $newCategoryName]);
             $_SESSION['is_addition_success'] = true;
-        }
-        else
-        {
+        } else {
             $_SESSION['is_valid'] = false;
         }
-    }
-    // deletion
-    else if (isset($_POST['delete']))
-    {
+    } elseif (isset($_POST['delete'])) {
         $categoryId = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
 
-        if ($categoryId !== false)
-        {
+        if ($categoryId !== false) {
             $stmt = $pdo->prepare("DELETE FROM categories WHERE id = :id");
             $stmt->execute(['id' => $categoryId]);
             $_SESSION['is_deletion_success'] = true;
-        }
-        else
-        {
+        } else {
             $_SESSION['is_deletion_success'] = false;
         }
     }
 
     header("Location: /categories", true, 303);
     die();
-}
-else if ($_SERVER['REQUEST_METHOD'] === 'GET')
-{
-    if (isset($_SESSION['is_valid']))
-    {
+} elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (isset($_SESSION['is_valid'])) {
         $isValid = $_SESSION['is_valid'];
         unset($_SESSION['is_valid']);
     }
 
-    if (isset($_SESSION['is_addition_success']))
-    {
+    if (isset($_SESSION['is_addition_success'])) {
         $isAdditionSuccess = $_SESSION['is_addition_success'];
         unset($_SESSION['is_addition_success']);
     }
 
-    if (isset($_SESSION['is_deletion_success']))
-    {
+    if (isset($_SESSION['is_deletion_success'])) {
         $isDeletionSuccess = $_SESSION['is_deletion_success'];
         unset($_SESSION['is_deletion_success']);
     }

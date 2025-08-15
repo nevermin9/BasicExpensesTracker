@@ -7,10 +7,8 @@ $cols = [];
 $errors = [];
 $isSuccess = false;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit']))
-{
-    if (!isset($_POST['token']) || !hash_equals($_SESSION['csrf_token'], $_POST['token']))
-    {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    if (!isset($_POST['token']) || !hash_equals($_SESSION['csrf_token'], $_POST['token'])) {
         exit('Something is wrong...');
     }
 
@@ -25,34 +23,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit']))
 
     $cols['sum'] = filter_var($cols['sum'], FILTER_VALIDATE_FLOAT, ['options' => ['min_range' => 0]]);
 
-    if (empty($cols['name']) || mb_strlen($cols['name']) < 3 || mb_strlen($cols['name']) > 100)
-    {
+    if (empty($cols['name']) || mb_strlen($cols['name']) < 3 || mb_strlen($cols['name']) > 100) {
         $errors['Name'] = 'Invalid name';
     }
 
-    if (!empty($cols['description']) && mb_strlen($cols['description']) > 150)
-    {
+    if (!empty($cols['description']) && mb_strlen($cols['description']) > 150) {
         $errors['Description'] = 'Description is too long';
     }
 
-    if ($cols['sum'] === false)
-    {
+    if ($cols['sum'] === false) {
         $errors['Sum'] = 'Invalid sum';
     }
 
-    if (!in_array($cols['type'], ['Expense', 'Income'], true))
-    {
+    if (!in_array($cols['type'], ['Expense', 'Income'], true)) {
         $errors['Type'] = "Invalid type";
     }
 
     $categoriesIds = array_column($categoriesList, 'id');
-    if ($cols['category_id'] === false || !in_array($cols['category_id'], $categoriesIds, true))
-    {
+    if ($cols['category_id'] === false || !in_array($cols['category_id'], $categoriesIds, true)) {
         $errors['Category'] = "Invalid category";
     }
 
-    if (empty($errors))
-    {
+    if (empty($errors)) {
         $stmt = $pdo->prepare(
             "INSERT INTO expenses(" . implode(", ", array_keys($cols)) . ")" . "VALUES(:" . implode(", :", array_keys($cols)) . ")"
         );
@@ -66,23 +58,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit']))
 
     header('Location: /', true, 303);
     die();
-} 
-else if ( $_SERVER['REQUEST_METHOD'] === 'GET' )
-{
-    if (isset($_SESSION['errors']))
-    {
+} elseif ( $_SERVER['REQUEST_METHOD'] === 'GET' ) {
+    if (isset($_SESSION['errors'])) {
         $errors = $_SESSION['errors'];
         unset($_SESSION['errors']);
     }
 
-    if (isset($_SESSION['cols']))
-    {
+    if (isset($_SESSION['cols'])) {
         $cols = $_SESSION['cols'];
         unset($_SESSION['cols']);
     }
 
-    if (isset($_SESSION['is_success']))
-    {
+    if (isset($_SESSION['is_success'])) {
         $isSuccess = $_SESSION['is_success'];
         unset($_SESSION['is_success']);
     }

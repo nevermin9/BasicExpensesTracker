@@ -25,21 +25,15 @@ function doRouting($reqUri): array
     $filepath = "";
     $status = 200;
 
-    if ($reqUri === "/" || $reqUri === "")
-    {
+    if ($reqUri === "/" || $reqUri === "") {
         $filepath = __DIR__ . $viewsDir . "/home.php";
-    }
-    else
-    {
+    } else {
         $uris = array_values($GLOBALS['navigation']);
         $found = array_find($uris, static fn($u) => $u === $reqUri);
 
-        if ($found)
-        {
+        if ($found) {
             $filepath = __DIR__ . $viewsDir . $found . ".php";
-        }
-        else
-        {
+        } else {
             $filepath = __DIR__ . $viewsDir . "/404.php";
             $status = 404;
         }
